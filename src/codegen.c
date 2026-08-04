@@ -56,7 +56,7 @@ void generate(Node* tree, const char* path)
 
     while (current)
     {
-        if (current->type == NODE_EXIT)
+        if (current->type == NODE_RETURN)
         {
             Node* exprNode = current->firstChild;
             gen_expr(exprNode);

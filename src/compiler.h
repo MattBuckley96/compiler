@@ -26,7 +26,7 @@ typedef enum TokenType
     TOKEN_RPAREN,
     TOKEN_PLUS,
     TOKEN_SEMI,
-    TOKEN_EXIT,
+    TOKEN_RETURN,
     TOKEN_ID,
 } TokenType;
 
@@ -42,7 +42,7 @@ Token* tokenize(char* contents);
 typedef enum NodeType
 {
     NODE_PROGRAM,
-    NODE_EXIT,
+    NODE_RETURN,
     NODE_INT,
     NODE_EXPR,
     NODE_OP_ADD,

@@ -112,12 +112,12 @@ Node* parse(Token* tokens)
 
     while (list)
     {
-        if (check_next_and_consume(TOKEN_EXIT))
+        if (check_next_and_consume(TOKEN_RETURN))
         {
-            Node* exitNode = root;
-            exitNode = add_child(root, NODE_EXIT, STRLIT("Exit"));
+            Node* returnNode = root;
+            returnNode = add_child(root, NODE_RETURN, STRLIT("Return"));
 
-            parse_expr(exitNode);
+            parse_expr(returnNode);
         }
 
         list = list->next;

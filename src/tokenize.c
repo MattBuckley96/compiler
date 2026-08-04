@@ -83,9 +83,9 @@ Token* tokenize(char* contents)
         i--;
         buf[pos] = '\0';
 
-        if (strcmp(buf, "exit") == 0)
+        if (strcmp(buf, "return") == 0)
         {
-            push_token(TOKEN_EXIT, string_new(buf));
+            push_token(TOKEN_RETURN, string_new(buf));
             continue;
         }
 
