@@ -30,9 +30,11 @@ typedef enum TokenType
     TOKEN_SEMI,
 
     TOKEN_PLUS,
+    TOKEN_EQUALS,
 
     TOKEN_RETURN,
     TOKEN_FN,
+    TOKEN_LET,
 
     TOKEN_ID,
 } TokenType;
@@ -55,9 +57,11 @@ typedef enum NodeType
     NODE_EXPR,
 
     NODE_OP_ADD,
+    NODE_OP_ASSIGN,
 
     NODE_RETURN,
     NODE_FN,
+    NODE_VAR,
 
     NODE_ID,
 } NodeType;
@@ -71,5 +75,12 @@ typedef struct Node
 } Node;
 
 Node* parse(Token* tokens);
+
+typedef struct Var 
+{
+    size_t stackOffset;
+    String id;
+    struct Var* next;
+} Var;
 
 void generate(Node* tree, const char* path);

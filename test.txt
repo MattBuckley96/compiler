@@ -1,7 +1,4 @@
-fn balls() {
-    return 1;
-}
-
 fn main() {
-    return 1 + 1;
+    let x = 10;
+    return 1;
 }

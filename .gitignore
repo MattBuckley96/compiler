@@ -1,3 +1,5 @@
 *.exe
+*.ilk
+*.pdb
 *.asm
 *.o

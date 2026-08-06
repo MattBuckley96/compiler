@@ -62,6 +62,11 @@ Token* tokenize(char* contents)
             push_token(TOKEN_PLUS, STRLIT("+"));
             continue;
         }
+        if (c == '=')
+        {
+            push_token(TOKEN_EQUALS, STRLIT("="));
+            continue;
+        }
 
         // get integers
         if (isdigit(c))
@@ -104,6 +109,12 @@ Token* tokenize(char* contents)
         if (strcmp(buf, "fn") == 0)
         {
             push_token(TOKEN_FN, string_new(buf));
+            continue;
+        }
+
+        if (strcmp(buf, "let") == 0)
+        {
+            push_token(TOKEN_LET, string_new(buf));
             continue;
         }
 

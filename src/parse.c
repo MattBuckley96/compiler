@@ -100,6 +100,60 @@ static void parse_expr(Node* root)
     }
 }
 
+static void parse_var(Node* root)
+{
+    if (!check_next_and_consume(TOKEN_ID))
+    {
+        printf("Variable needs Identifier!\n");
+        exit(-1);
+    }
+
+    Node* idNode = add_child(root, NODE_ID, list->string);
+
+    if (!check_next_and_consume(TOKEN_EQUALS))
+    {
+        printf("Unassigned variable!\n");
+        exit(-1);
+    }
+
+    Node* equalsNode = add_child(root, NODE_OP_ASSIGN, STRLIT("="));
+    parse_expr(equalsNode);
+}
+
+static void parse_fn(Node* root)
+{
+    if (!check_next_and_consume(TOKEN_ID))
+    {
+        printf("Function needs Identifier!\n");
+        exit(-1);
+    }
+
+    Node* idNode = add_child(root, NODE_ID, list->string);
+
+    check_next_and_consume(TOKEN_LPAREN);
+    check_next_and_consume(TOKEN_RPAREN);
+    check_next_and_consume(TOKEN_LBRACE);
+
+    while (!check_next_and_consume(TOKEN_RBRACE))
+    {
+        if (check_next_and_consume(TOKEN_LET))
+        {
+            Node* varNode = add_child(root, NODE_VAR, STRLIT("Variable"));
+            parse_var(varNode);
+            continue;
+        }
+
+        if (check_next_and_consume(TOKEN_RETURN))
+        {
+            Node* returnNode = add_child(root, NODE_RETURN, STRLIT("Return"));
+            parse_expr(returnNode);
+            continue;
+        }
+        
+        list = list->next;
+    }
+}
+
 Node* parse(Token* tokens)
 {
     tree = (Node*)malloc(sizeof(Node));
@@ -117,25 +171,7 @@ Node* parse(Token* tokens)
             Node* fnNode = root;
             fnNode = add_child(root, NODE_FN, STRLIT("Function"));
 
-            if (!check_next_and_consume(TOKEN_ID))
-            {
-                printf("Function needs Identifier!\n");
-                exit(-1);
-            }
-
-            Node* idNode = add_child(fnNode, NODE_ID, list->string);
-
-            check_next_and_consume(TOKEN_LPAREN);
-            check_next_and_consume(TOKEN_RPAREN);
-            check_next_and_consume(TOKEN_LBRACE);
-
-            if (check_next_and_consume(TOKEN_RETURN))
-            {
-                Node* returnNode = add_child(fnNode, NODE_RETURN, STRLIT("Return"));
-                parse_expr(returnNode);
-            }
-
-            check_next_and_consume(TOKEN_RBRACE);
+            parse_fn(fnNode);
         }
 
         list = list->next;
