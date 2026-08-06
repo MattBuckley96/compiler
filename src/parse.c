@@ -61,17 +61,15 @@ static bool check_next_and_consume(TokenType type)
 
 static void parse_expr(Node* root)
 {
-    if (!check_next_and_consume(TOKEN_LPAREN))
-    {
-        printf("Expression needs a '('!\n");
-        exit(0);
-    }
+    // consume paren if there
+    check_next_and_consume(TOKEN_LPAREN);
+
     Node* exprNode = add_child(root, NODE_EXPR, STRLIT("Expr"));
 
     if (!check_next_and_consume(TOKEN_INT))
     {
         printf("Expression must have an int!\n");
-        exit(0);
+        exit(-1);
     }
     Token* leftIntToken = list;
 
@@ -80,8 +78,8 @@ static void parse_expr(Node* root)
         Node* addNode = add_child(exprNode, NODE_OP_ADD, STRLIT("+"));
         if (!check_next_and_consume(TOKEN_INT))
         {
-            printf("Operation must have two ints!\n");
-            exit(0);
+            printf("Addition needs two ints!\n");
+            exit(-1);
         }
         Token* rightIntToken = list;
 
@@ -93,10 +91,12 @@ static void parse_expr(Node* root)
         add_child(exprNode, NODE_INT, leftIntToken->string);
     }
 
-    if (!check_next_and_consume(TOKEN_RPAREN) || !check_next(TOKEN_SEMI))
+    check_next_and_consume(TOKEN_RPAREN);
+
+    if (!check_next(TOKEN_SEMI))
     {
-        printf("Parsing error!\n");
-        exit(0);
+        printf("End of statement needs ';'!\n");
+        exit(-1);
     }
 }
 
@@ -112,12 +112,30 @@ Node* parse(Token* tokens)
 
     while (list)
     {
-        if (check_next_and_consume(TOKEN_RETURN))
+        if (check_next_and_consume(TOKEN_FN))
         {
-            Node* returnNode = root;
-            returnNode = add_child(root, NODE_RETURN, STRLIT("Return"));
+            Node* fnNode = root;
+            fnNode = add_child(root, NODE_FN, STRLIT("Function"));
 
-            parse_expr(returnNode);
+            if (!check_next_and_consume(TOKEN_ID))
+            {
+                printf("Function needs Identifier!\n");
+                exit(-1);
+            }
+
+            Node* idNode = add_child(fnNode, NODE_ID, list->string);
+
+            check_next_and_consume(TOKEN_LPAREN);
+            check_next_and_consume(TOKEN_RPAREN);
+            check_next_and_consume(TOKEN_LBRACE);
+
+            if (check_next_and_consume(TOKEN_RETURN))
+            {
+                Node* returnNode = add_child(fnNode, NODE_RETURN, STRLIT("Return"));
+                parse_expr(returnNode);
+            }
+
+            check_next_and_consume(TOKEN_RBRACE);
         }
 
         list = list->next;

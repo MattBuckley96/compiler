@@ -1,1 +1,7 @@
-return (1 + 1);
+fn balls() {
+    return 1;
+}
+
+fn main() {
+    return 1 + 1;
+}

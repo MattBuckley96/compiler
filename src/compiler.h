@@ -22,11 +22,18 @@ char* read_file(const char* path);
 typedef enum TokenType
 {
     TOKEN_INT,
+
     TOKEN_LPAREN,
     TOKEN_RPAREN,
-    TOKEN_PLUS,
+    TOKEN_LBRACE,
+    TOKEN_RBRACE,
     TOKEN_SEMI,
+
+    TOKEN_PLUS,
+
     TOKEN_RETURN,
+    TOKEN_FN,
+
     TOKEN_ID,
 } TokenType;
 
@@ -42,10 +49,17 @@ Token* tokenize(char* contents);
 typedef enum NodeType
 {
     NODE_PROGRAM,
-    NODE_RETURN,
+
     NODE_INT,
+
     NODE_EXPR,
+
     NODE_OP_ADD,
+
+    NODE_RETURN,
+    NODE_FN,
+
+    NODE_ID,
 } NodeType;
 
 typedef struct Node

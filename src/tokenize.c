@@ -40,11 +40,23 @@ Token* tokenize(char* contents)
             push_token(TOKEN_RPAREN, STRLIT(")"));
             continue;
         }
+        if (c == '{')
+        {
+            push_token(TOKEN_LBRACE, STRLIT("{"));
+            continue;
+        }
+        if (c == '}')
+        {
+            push_token(TOKEN_RBRACE, STRLIT("}"));
+            continue;
+        }
         if (c == ';')
         {
             push_token(TOKEN_SEMI, STRLIT(";"));
             continue;
         }
+
+        // operations
         if (c == '+')
         {
             push_token(TOKEN_PLUS, STRLIT("+"));
@@ -86,6 +98,12 @@ Token* tokenize(char* contents)
         if (strcmp(buf, "return") == 0)
         {
             push_token(TOKEN_RETURN, string_new(buf));
+            continue;
+        }
+
+        if (strcmp(buf, "fn") == 0)
+        {
+            push_token(TOKEN_FN, string_new(buf));
             continue;
         }
 
