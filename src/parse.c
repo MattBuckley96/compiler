@@ -66,29 +66,38 @@ static void parse_expr(Node* root)
 
     Node* exprNode = add_child(root, NODE_EXPR, STRLIT("Expr"));
 
-    if (!check_next_and_consume(TOKEN_INT))
+    // TODO: clean up 
+    if (check_next_and_consume(TOKEN_INT))
     {
-        printf("Expression must have an int!\n");
-        exit(-1);
-    }
-    Token* leftIntToken = list;
+        Token* leftIntToken = list;
 
-    if (check_next_and_consume(TOKEN_PLUS))
-    {
-        Node* addNode = add_child(exprNode, NODE_OP_ADD, STRLIT("+"));
-        if (!check_next_and_consume(TOKEN_INT))
+        if (check_next_and_consume(TOKEN_PLUS))
         {
-            printf("Addition needs two ints!\n");
-            exit(-1);
-        }
-        Token* rightIntToken = list;
+            Node* addNode = add_child(exprNode, NODE_OP_ADD, STRLIT("+"));
+            if (!check_next_and_consume(TOKEN_INT))
+            {
+                printf("Addition needs two ints!\n");
+                exit(-1);
+            }
+            Token* rightIntToken = list;
 
-        add_child(addNode, NODE_INT, leftIntToken->string);
-        add_child(addNode, NODE_INT, rightIntToken->string);
+            add_child(addNode, NODE_INT, leftIntToken->string);
+            add_child(addNode, NODE_INT, rightIntToken->string);
+        }
+        else
+        {
+            add_child(exprNode, NODE_INT, leftIntToken->string);
+        }
+    } 
+    else if (check_next_and_consume(TOKEN_ID)) 
+    {
+        Token* idToken = list;
+        add_child(exprNode, NODE_ID, idToken->string);
     }
     else
     {
-        add_child(exprNode, NODE_INT, leftIntToken->string);
+        printf("Invalid Expression\n");
+        exit(-1);
     }
 
     check_next_and_consume(TOKEN_RPAREN);
@@ -134,7 +143,7 @@ static void parse_fn(Node* root)
     check_next_and_consume(TOKEN_RPAREN);
     check_next_and_consume(TOKEN_LBRACE);
 
-    while (!check_next_and_consume(TOKEN_RBRACE))
+    while (!check_next(TOKEN_RBRACE))
     {
         if (check_next_and_consume(TOKEN_LET))
         {

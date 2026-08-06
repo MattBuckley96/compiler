@@ -1,9 +1,10 @@
 #include "compiler.h"
 
-// NOTE: assumes AST is 100% correct
+// NOTE: assumes AST is syntactically correct
 
 static FILE* file;
 static Var* vars;
+static Var* varsHead;
 static size_t stackPointer;
 
 static void push_var(size_t stackOffset, String id)
@@ -14,6 +15,21 @@ static void push_var(size_t stackOffset, String id)
     vars->next->next = NULL;
 
     vars = vars->next;
+}
+
+static Var* find_var(String id)
+{
+    Var* current = varsHead->next;
+    while (current)
+    {
+        if (strcmp(id.str, current->id.str) == 0)
+        {
+            return current;
+        }
+        current = current->next;
+    }
+
+    return NULL;
 }
 
 static void gen_expr(Node* exprNode)
@@ -27,16 +43,34 @@ static void gen_expr(Node* exprNode)
         int leftInt = atoi(leftIntNode->string.str);
         int rightInt = atoi(rightIntNode->string.str);
 
-        fprintf(file, "    mov ebx, %i\n", leftInt);
-        fprintf(file, "    mov ecx, %i\n", rightInt);
-        fprintf(file, "    add ebx, ecx\n");
-        fprintf(file, "    mov eax, ebx\n");
+        fprintf(file, "    mov eax, %i\n", leftInt);
+        fprintf(file, "    mov ebx, %i\n", rightInt);
+        fprintf(file, "    add eax, ebx\n");
+
+        return;
     }
-    else
+
+    if (exprNode->firstChild->type == NODE_INT)
     {
         Node* intNode = exprNode->firstChild;
         int exitCode = atoi(intNode->string.str);
         fprintf(file, "    mov eax, %i\n", exitCode);
+        return;
+    }
+
+    if (exprNode->firstChild->type == NODE_ID)
+    {
+        Node* idNode = exprNode->firstChild;
+        Var* var = find_var(idNode->string);
+
+        if (!var)
+        {
+            printf("%s is not declared!\n", idNode->string.str);
+            exit(-1);
+        }
+
+        fprintf(file, "    mov eax, dword [rbp - %llu]\n", var->stackOffset);
+        return;
     }
 }
 
@@ -89,6 +123,7 @@ void generate(Node* tree, const char* path)
 {
     vars = (Var*)malloc(sizeof(Var));
     memset(vars, 0, sizeof(Var));
+    varsHead = vars;
     stackPointer = 0;
 
     file = fopen(path, "w");
