@@ -16,5 +16,7 @@ run: $(TARGET)
 
 clean:
 	rm -f *.exe
+	rm -f *.pdb 
+	rm -f *.ilk
 	rm -f *.asm
 	rm -f *.o

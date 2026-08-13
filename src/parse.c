@@ -59,9 +59,45 @@ static bool check_next_and_consume(TokenType type)
     return false;
 }
 
-static void parse_term(Node* root)
+// this function is very questionable
+static void parse_term(Node* root, bool checkOperation)
 {
     Node* termNode = add_child(root, NODE_TERM, STRLIT("Term"));
+
+    Token* current = list->next->next;
+    bool plusFound = false;
+    int tokenCount = 0;
+
+    while (checkOperation && current)
+    {
+        if (current->type == TOKEN_PLUS)
+        {
+            plusFound = true;
+            break;
+        }
+
+        if (tokenCount == 3)
+        {
+            break;
+        }
+
+        tokenCount++;
+        current = current->next;
+    }
+
+    if (plusFound)
+    {
+        Node* addNode = add_child(termNode, NODE_OP_ADD, STRLIT("+"));
+
+        // left
+        parse_term(addNode, false);
+
+        check_next_and_consume(TOKEN_PLUS);
+
+        // right
+        parse_term(addNode, true);
+        return;
+    }
 
     if (check_next_and_consume(TOKEN_INT))
     {
@@ -94,43 +130,7 @@ static void parse_term(Node* root)
 static void parse_expr(Node* root)
 {
     Node* exprNode = add_child(root, NODE_EXPR, STRLIT("Expr"));
-
-    // TODO: refactor this bs 
-    Token* current = list->next->next;
-    bool plusFound = false;
-
-    while (current)
-    {
-        if (current->type == TOKEN_PLUS)
-        {
-            plusFound = true;
-            break;
-        }
-
-        if (current->type == TOKEN_SEMI)
-        {
-            break;
-        }
-
-        current = current->next;
-    }
-
-    if (plusFound)
-    {
-        Node* addNode = add_child(exprNode, NODE_OP_ADD, STRLIT("+"));
-
-        // left
-        parse_term(addNode);
-
-        check_next_and_consume(TOKEN_PLUS);
-
-        // right
-        parse_term(addNode);
-    }
-    else
-    {
-        parse_term(exprNode);
-    }
+    parse_term(exprNode, true);
 
     if (!check_next(TOKEN_SEMI))
     {

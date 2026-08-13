@@ -34,7 +34,21 @@ static Var* find_var(String id)
 
 // TODO: do this
 static void gen_term(Node* termNode)
-{
+{   
+    if (termNode->firstChild->type == NODE_OP_ADD)
+    {
+        Node* addNode = termNode->firstChild;
+
+        Node* leftTermNode = addNode->firstChild;
+        Node* rightTermNode = leftTermNode->nextSibling;
+
+        gen_term(rightTermNode);
+        fprintf(file, "    mov rbx, rax\n");
+        gen_term(leftTermNode);
+        fprintf(file, "    add rax, rbx\n");
+        return;
+    }
+
     if (termNode->firstChild->type == NODE_INT)
     {
         Node* intNode = termNode->firstChild;
@@ -70,20 +84,6 @@ static void gen_term(Node* termNode)
 
 static void gen_expr(Node* exprNode)
 {
-    if (exprNode->firstChild->type == NODE_OP_ADD)
-    {
-        Node* addNode = exprNode->firstChild;
-
-        Node* leftTermNode = addNode->firstChild;
-        Node* rightTermNode = leftTermNode->nextSibling;
-
-        gen_term(rightTermNode);
-        fprintf(file, "    mov rbx, rax\n");
-        gen_term(leftTermNode);
-        fprintf(file, "    add rax, rbx\n");
-        return;
-    }
-
     Node* termNode = exprNode->firstChild;
     gen_term(termNode);
 }
