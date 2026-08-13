@@ -41,6 +41,16 @@ char* read_file(const char* path)
     return buffer;
 }
 
+void print_tokens(Token* tokens)
+{
+    Token* current = tokens;
+    while (current)
+    {
+        printf("token: %s\n", current->string.str);
+        current = current->next;
+    }
+}
+
 void print_tree(Node* root, size_t depth)
 {
     if (!root)
@@ -77,13 +87,7 @@ int main(int argc, char** argv)
     }
 
     Token* tokens = tokenize(contents);
-
-    Token* list = tokens;
-    while (list)
-    {
-        printf("token: %s\n", list->string.str);
-        list = list->next;
-    }
+    // print_tokens(tokens);
 
     Node* tree = parse(tokens);
     print_tree(tree, 0);

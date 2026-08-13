@@ -150,13 +150,20 @@ static void parse_fn(Node* root)
             continue;
         }
 
+        if (check_next(TOKEN_ID))
+        {
+            Node* varNode = add_child(root, NODE_VAR, STRLIT("Variable"));
+            parse_var(varNode);
+            continue;
+        }
+
         if (check_next_and_consume(TOKEN_RETURN))
         {
             Node* returnNode = add_child(root, NODE_RETURN, STRLIT("Return"));
             parse_expr(returnNode);
             continue;
         }
-        
+
         list = list->next;
     }
 }

@@ -81,11 +81,14 @@ static void gen_expr(Node* exprNode)
 
 static void gen_var(Node* varNode)
 {
-    stackPointer += 4;
     Node* idNode = varNode->firstChild;
-    push_var(stackPointer, idNode->string);
 
-    // HACK: puts the int in eax
+    if (!find_var(idNode->string))
+    {
+        stackPointer += 4;
+        push_var(stackPointer, idNode->string);
+    }
+
     Node* exprNode = idNode->nextSibling->firstChild;
     gen_expr(exprNode);
     fprintf(file, "    mov dword [rbp - %llu], eax\n", stackPointer);
