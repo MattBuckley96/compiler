@@ -61,6 +61,7 @@ typedef enum NodeType
     NODE_OP_ASSIGN,
 
     NODE_RETURN,
+    NODE_LET,
     NODE_FN,
     NODE_VAR,
 

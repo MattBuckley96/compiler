@@ -145,8 +145,8 @@ static void parse_fn(Node* root)
     {
         if (check_next_and_consume(TOKEN_LET))
         {
-            Node* varNode = add_child(root, NODE_VAR, STRLIT("Variable"));
-            parse_var(varNode);
+            Node* letNode = add_child(root, NODE_LET, STRLIT("Let"));
+            parse_var(letNode);
             continue;
         }
 

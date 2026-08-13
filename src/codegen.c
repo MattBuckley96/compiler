@@ -39,7 +39,7 @@ static void gen_term(Node* termNode)
     {
         Node* intNode = termNode->firstChild;
         int exitCode = atoi(intNode->string.str);
-        fprintf(file, "    mov eax, %i\n", exitCode);
+        fprintf(file, "    mov rax, %i\n", exitCode);
         return;
     }
 
@@ -54,7 +54,7 @@ static void gen_term(Node* termNode)
             exit(-1);
         }
 
-        fprintf(file, "    mov eax, dword [rbp - %llu]\n", var->stackOffset);
+        fprintf(file, "    mov rax, qword [rbp - %llu]\n", var->stackOffset);
         return;
     }
 }
@@ -69,14 +69,25 @@ static void gen_expr(Node* exprNode)
         Node* rightTermNode = leftTermNode->nextSibling;
 
         gen_term(rightTermNode);
-        fprintf(file, "    mov ebx, eax\n");
+        fprintf(file, "    mov rbx, rax\n");
         gen_term(leftTermNode);
-        fprintf(file, "    add eax, ebx\n");
+        fprintf(file, "    add rax, rbx\n");
         return;
     }
 
     Node* termNode = exprNode->firstChild;
     gen_term(termNode);
+}
+
+static void gen_let(Node* letNode)
+{
+    Node* idNode = letNode->firstChild;
+    stackPointer += 4;
+    push_var(stackPointer, idNode->string);
+
+    Node* exprNode = idNode->nextSibling->firstChild;
+    gen_expr(exprNode);
+    fprintf(file, "    mov qword [rbp - %llu], rax\n", stackPointer);
 }
 
 static void gen_var(Node* varNode)
@@ -85,13 +96,13 @@ static void gen_var(Node* varNode)
 
     if (!find_var(idNode->string))
     {
-        stackPointer += 4;
-        push_var(stackPointer, idNode->string);
+        printf("%s is not declared!\n", idNode->string.str);
+        exit(-1);
     }
 
     Node* exprNode = idNode->nextSibling->firstChild;
     gen_expr(exprNode);
-    fprintf(file, "    mov dword [rbp - %llu], eax\n", stackPointer);
+    fprintf(file, "    mov qword [rbp - %llu], rax\n", stackPointer);
 }
 
 static void gen_fn(Node* fnNode)
@@ -110,6 +121,13 @@ static void gen_fn(Node* fnNode)
         {
             Node* exprNode = current->firstChild;
             gen_expr(exprNode);
+            fputc('\n', file);
+        }
+
+        if (current->type == NODE_LET)
+        {
+            Node* letNode = current;
+            gen_let(letNode);
             fputc('\n', file);
         }
 
