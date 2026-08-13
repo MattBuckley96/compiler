@@ -87,7 +87,7 @@ int main(int argc, char** argv)
     }
 
     Token* tokens = tokenize(contents);
-    // print_tokens(tokens);
+    print_tokens(tokens);
 
     Node* tree = parse(tokens);
     print_tree(tree, 0);

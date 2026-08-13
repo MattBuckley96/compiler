@@ -43,6 +43,15 @@ static void gen_term(Node* termNode)
         return;
     }
 
+    if (termNode->firstChild->type == NODE_FN_CALL)
+    {
+        Node* fnCallNode = termNode->firstChild;
+        Node* idNode = fnCallNode->firstChild;
+
+        fprintf(file, "    call %s\n", idNode->string.str);
+        return;
+    }
+
     if (termNode->firstChild->type == NODE_ID)
     {
         Node* idNode = termNode->firstChild;
@@ -109,7 +118,11 @@ static void gen_fn(Node* fnNode)
 {
     Node* idNode = fnNode->firstChild;
 
-    fprintf(file, "\nglobal %s\n", idNode->string.str);
+    if (strcmp(idNode->string.str, "main") == 0)
+    {
+        fprintf(file, "\nglobal %s\n", idNode->string.str);
+    }
+
     fprintf(file, "%s:\n", idNode->string.str);
     fprintf(file, "    push rbp\n");
     fprintf(file, "    mov rbp, rsp\n\n");

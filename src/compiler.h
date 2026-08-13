@@ -64,6 +64,7 @@ typedef enum NodeType
     NODE_LET,
     NODE_FN,
     NODE_VAR,
+    NODE_FN_CALL,
 
     NODE_ID,
 } NodeType;

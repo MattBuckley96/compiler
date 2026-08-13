@@ -1,5 +1,7 @@
+fn balls() {
+    return 10;
+}
+
 fn main() {
-    let x = 0;
-    let y = 1;
-    return y;
+    return balls();
 }

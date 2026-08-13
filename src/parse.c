@@ -71,7 +71,19 @@ static void parse_term(Node* root)
 
     if (check_next_and_consume(TOKEN_ID))
     {
-        add_child(termNode, NODE_ID, list->string);
+        if (check_next(TOKEN_LPAREN))
+        {
+            Node* fnCallNode = add_child(termNode, NODE_FN_CALL, STRLIT("FunctionCall"));
+            add_child(fnCallNode, NODE_ID, list->string);
+
+            check_next_and_consume(TOKEN_LPAREN);
+            check_next_and_consume(TOKEN_RPAREN);
+        }
+        else
+        {
+            add_child(termNode, NODE_ID, list->string);
+        }
+
         return;
     }
 
