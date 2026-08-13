@@ -1,7 +1,8 @@
 fn balls() {
-    return 10;
+    return 1;
 }
 
 fn main() {
-    return balls();
+    let x = balls() + balls();
+    return x;
 }

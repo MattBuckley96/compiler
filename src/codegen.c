@@ -91,7 +91,7 @@ static void gen_expr(Node* exprNode)
 static void gen_let(Node* letNode)
 {
     Node* idNode = letNode->firstChild;
-    stackPointer += 4;
+    stackPointer += 8;
     push_var(stackPointer, idNode->string);
 
     Node* exprNode = idNode->nextSibling->firstChild;

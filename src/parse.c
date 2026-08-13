@@ -95,7 +95,27 @@ static void parse_expr(Node* root)
 {
     Node* exprNode = add_child(root, NODE_EXPR, STRLIT("Expr"));
 
-    if (list->next->next && list->next->next->type == TOKEN_PLUS)
+    // TODO: refactor this bs 
+    Token* current = list->next->next;
+    bool plusFound = false;
+
+    while (current)
+    {
+        if (current->type == TOKEN_PLUS)
+        {
+            plusFound = true;
+            break;
+        }
+
+        if (current->type == TOKEN_SEMI)
+        {
+            break;
+        }
+
+        current = current->next;
+    }
+
+    if (plusFound)
     {
         Node* addNode = add_child(exprNode, NODE_OP_ADD, STRLIT("+"));
 
