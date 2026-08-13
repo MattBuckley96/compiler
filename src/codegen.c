@@ -32,35 +32,20 @@ static Var* find_var(String id)
     return NULL;
 }
 
-static void gen_expr(Node* exprNode)
+// TODO: do this
+static void gen_term(Node* termNode)
 {
-    if (exprNode->firstChild->type == NODE_OP_ADD)
+    if (termNode->firstChild->type == NODE_INT)
     {
-        Node* addNode = exprNode->firstChild;
-        Node* leftIntNode = addNode->firstChild;
-        Node* rightIntNode = leftIntNode->nextSibling;
-
-        int leftInt = atoi(leftIntNode->string.str);
-        int rightInt = atoi(rightIntNode->string.str);
-
-        fprintf(file, "    mov eax, %i\n", leftInt);
-        fprintf(file, "    mov ebx, %i\n", rightInt);
-        fprintf(file, "    add eax, ebx\n");
-
-        return;
-    }
-
-    if (exprNode->firstChild->type == NODE_INT)
-    {
-        Node* intNode = exprNode->firstChild;
+        Node* intNode = termNode->firstChild;
         int exitCode = atoi(intNode->string.str);
         fprintf(file, "    mov eax, %i\n", exitCode);
         return;
     }
 
-    if (exprNode->firstChild->type == NODE_ID)
+    if (termNode->firstChild->type == NODE_ID)
     {
-        Node* idNode = exprNode->firstChild;
+        Node* idNode = termNode->firstChild;
         Var* var = find_var(idNode->string);
 
         if (!var)
@@ -72,6 +57,26 @@ static void gen_expr(Node* exprNode)
         fprintf(file, "    mov eax, dword [rbp - %llu]\n", var->stackOffset);
         return;
     }
+}
+
+static void gen_expr(Node* exprNode)
+{
+    if (exprNode->firstChild->type == NODE_OP_ADD)
+    {
+        Node* addNode = exprNode->firstChild;
+
+        Node* leftTermNode = addNode->firstChild;
+        Node* rightTermNode = leftTermNode->nextSibling;
+
+        gen_term(rightTermNode);
+        fprintf(file, "    mov ebx, eax\n");
+        gen_term(leftTermNode);
+        fprintf(file, "    add eax, ebx\n");
+        return;
+    }
+
+    Node* termNode = exprNode->firstChild;
+    gen_term(termNode);
 }
 
 static void gen_var(Node* varNode)

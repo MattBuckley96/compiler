@@ -55,6 +55,7 @@ typedef enum NodeType
     NODE_INT,
 
     NODE_EXPR,
+    NODE_TERM,
 
     NODE_OP_ADD,
     NODE_OP_ASSIGN,

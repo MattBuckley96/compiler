@@ -50,7 +50,7 @@ void print_tree(Node* root, size_t depth)
 
     for (size_t i = 0; i < depth; i++)
     {
-        printf("    ");
+        printf("  ");
     }
 
     printf("%s\n", root->string.str);

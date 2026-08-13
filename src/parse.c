@@ -59,48 +59,46 @@ static bool check_next_and_consume(TokenType type)
     return false;
 }
 
-static void parse_expr(Node* root)
+static void parse_term(Node* root)
 {
-    // consume paren if there
-    check_next_and_consume(TOKEN_LPAREN);
+    Node* termNode = add_child(root, NODE_TERM, STRLIT("Term"));
 
-    Node* exprNode = add_child(root, NODE_EXPR, STRLIT("Expr"));
-
-    // TODO: clean up 
     if (check_next_and_consume(TOKEN_INT))
     {
-        Token* leftIntToken = list;
+        add_child(termNode, NODE_INT, list->string);
+        return;
+    }
 
-        if (check_next_and_consume(TOKEN_PLUS))
-        {
-            Node* addNode = add_child(exprNode, NODE_OP_ADD, STRLIT("+"));
-            if (!check_next_and_consume(TOKEN_INT))
-            {
-                printf("Addition needs two ints!\n");
-                exit(-1);
-            }
-            Token* rightIntToken = list;
-
-            add_child(addNode, NODE_INT, leftIntToken->string);
-            add_child(addNode, NODE_INT, rightIntToken->string);
-        }
-        else
-        {
-            add_child(exprNode, NODE_INT, leftIntToken->string);
-        }
-    } 
-    else if (check_next_and_consume(TOKEN_ID)) 
+    if (check_next_and_consume(TOKEN_ID))
     {
-        Token* idToken = list;
-        add_child(exprNode, NODE_ID, idToken->string);
+        add_child(termNode, NODE_ID, list->string);
+        return;
+    }
+
+    printf("Invalid term!\n");
+    exit(-1);
+}
+
+static void parse_expr(Node* root)
+{
+    Node* exprNode = add_child(root, NODE_EXPR, STRLIT("Expr"));
+
+    if (list->next->next && list->next->next->type == TOKEN_PLUS)
+    {
+        Node* addNode = add_child(exprNode, NODE_OP_ADD, STRLIT("+"));
+
+        // left
+        parse_term(addNode);
+
+        check_next_and_consume(TOKEN_PLUS);
+
+        // right
+        parse_term(addNode);
     }
     else
     {
-        printf("Invalid Expression\n");
-        exit(-1);
+        parse_term(exprNode);
     }
-
-    check_next_and_consume(TOKEN_RPAREN);
 
     if (!check_next(TOKEN_SEMI))
     {
