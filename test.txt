@@ -1,4 +1,9 @@
+fn two() {
+    let two = 2;
+    return two;
+}
+
 fn main() {
-    let x = 1 + 1 + 1 + 1 + 1;
+    let x = 1 + two() + 3;
     return x;
 }

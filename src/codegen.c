@@ -32,6 +32,21 @@ static Var* find_var(String id)
     return NULL;
 }
 
+static void free_vars(void)
+{
+    Var* current = varsHead->next;
+
+    while (current)
+    {
+        Var* temp = current;
+        current = current->next;
+        free(temp);
+    }
+
+    vars = varsHead;
+    stackPointer = 0;
+}
+
 // TODO: do this
 static void gen_term(Node* termNode)
 {   
@@ -102,8 +117,9 @@ static void gen_let(Node* letNode)
 static void gen_var(Node* varNode)
 {
     Node* idNode = varNode->firstChild;
+    Var* var = find_var(idNode->string);
 
-    if (!find_var(idNode->string))
+    if (!var)
     {
         printf("%s is not declared!\n", idNode->string.str);
         exit(-1);
@@ -156,6 +172,8 @@ static void gen_fn(Node* fnNode)
 
     fprintf(file, "    pop rbp\n");
     fprintf(file, "    ret\n");
+
+    free_vars();
 }
 
 void generate(Node* tree, const char* path)
