@@ -59,14 +59,12 @@ static bool check_next_and_consume(TokenType type)
     return false;
 }
 
-// this function is very questionable
 static void parse_term(Node* root, bool checkOperation)
 {
     Node* termNode = add_child(root, NODE_TERM, STRLIT("Term"));
 
     Token* current = list->next->next;
     bool plusFound = false;
-    int tokenCount = 0;
 
     while (checkOperation && current)
     {
@@ -76,12 +74,11 @@ static void parse_term(Node* root, bool checkOperation)
             break;
         }
 
-        if (tokenCount == 3)
+        if (current->type == TOKEN_SEMI)
         {
             break;
         }
 
-        tokenCount++;
         current = current->next;
     }
 
