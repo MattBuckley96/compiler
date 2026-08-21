@@ -1,0 +1,4 @@
+[ ] function arguments
+[ ] pointers
+[ ] types
+[ ] structs

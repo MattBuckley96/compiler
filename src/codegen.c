@@ -141,9 +141,26 @@ static void gen_fn(Node* fnNode)
 
     fprintf(file, "%s:\n", idNode->string.str);
     fprintf(file, "    push rbp\n");
-    fprintf(file, "    mov rbp, rsp\n\n");
+    fprintf(file, "    mov rbp, rsp\n");
 
     Node* current = idNode->nextSibling;
+    size_t count = 0;
+    while (current)
+    {
+        if (current->type == NODE_LET)
+        {
+            count++;
+        }
+        current = current->nextSibling;
+    }
+
+    if (count > 0)
+    {
+        fprintf(file, "    sub rsp, %llu\n", (count * 8));
+    }
+    fprintf(file, "\n");
+
+    current = idNode->nextSibling;
     while (current)
     {
         if (current->type == NODE_RETURN)
@@ -170,6 +187,7 @@ static void gen_fn(Node* fnNode)
         current = current->nextSibling;
     }
 
+    fprintf(file, "    mov rsp, rbp\n");
     fprintf(file, "    pop rbp\n");
     fprintf(file, "    ret\n");
 
@@ -183,7 +201,7 @@ void generate(Node* tree, const char* path)
     varsHead = vars;
     stackPointer = 0;
 
-    file = fopen(path, "w");
+    file = fopen(path, "w+b");
     if (!file)
     {
         printf("couldn't open file: %s\n", path);
